@@ -270,6 +270,11 @@ public final class HttpsURLConnectionImpl extends HttpsURLConnection {
     return delegate.getHeaderFieldInt(field, defaultValue);
   }
 
+  public
+  void setAllowFailedPostRetry(boolean allow) {
+    delegate.setAllowFailedPostRetry(allow);
+  }
+
   @Override
   public String getHeaderFieldKey(int position) {
     return delegate.getHeaderFieldKey(position);

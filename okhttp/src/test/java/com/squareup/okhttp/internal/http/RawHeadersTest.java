@@ -15,12 +15,13 @@
  */
 package com.squareup.okhttp.internal.http;
 
+import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public final class RawHeadersTest {
   @Test public void parseNameValueBlock() {

@@ -98,6 +98,7 @@ public class HttpURLConnectionImpl extends HttpURLConnection {
   private List<String> transports;
   OkAuthenticator authenticator;
   final Set<Route> failedRoutes;
+  boolean allowFailedPostRetry = true;
 
   private final RawHeaders rawRequestHeaders = new RawHeaders();
 
@@ -123,10 +124,16 @@ public class HttpURLConnectionImpl extends HttpURLConnection {
     this.responseCache = responseCache;
   }
 
+  public
+  void setAllowFailedPostRetry(boolean allow) {
+      allowFailedPostRetry = allow;
+    }
+  
   Set<Route> getFailedRoutes() {
     return failedRoutes;
   }
 
+  public 
   List<String> getTransports() {
     return transports;
   }
@@ -423,10 +430,18 @@ public class HttpURLConnectionImpl extends HttpURLConnection {
     if (routeSelector == null && httpEngine.connection == null // No connection.
         || routeSelector != null && !routeSelector.hasNext() // No more routes to attempt.
         || !isRecoverable(e)
-        || !canRetryRequestBody) {
+        || !canRetryRequestBody
+        || !allowFailedPostRetry) {
       httpEngineFailure = e;
       return false;
     }
+    
+    if (!allowFailedPostRetry) {
+        System.out.println("FuckedHttp: allowFailedPostRetry Preventrion");
+        httpEngineFailure = e;
+        return false;
+    }
+    System.out.println("FuckedHttp: past Prevention");
 
     httpEngine.release(true);
     RetryableOutputStream retryableOutputStream = requestBody instanceof RetryableOutputStream
