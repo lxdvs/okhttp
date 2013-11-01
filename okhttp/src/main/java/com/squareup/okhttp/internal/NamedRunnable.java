@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 The Android Open Source Project
+ * Copyright (C) 2013 Square, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.squareup.okhttp.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
+/**
+ * Runnable implementation which always sets its thread name.
+ */
+public abstract class NamedRunnable implements Runnable {
+  private final String name;
 
-public final class RecordingHostnameVerifier implements HostnameVerifier {
-  public final List<String> calls = new ArrayList<String>();
-
-  public boolean verify(String hostname, SSLSession session) {
-    calls.add("verify " + hostname);
-    return true;
+  public NamedRunnable(String format, Object... args) {
+    this.name = String.format(format, args);
   }
+
+  @Override public final void run() {
+    String oldName = Thread.currentThread().getName();
+    Thread.currentThread().setName(name);
+    try {
+      execute();
+    } finally {
+      Thread.currentThread().setName(oldName);
+    }
+  }
+
+  protected abstract void execute();
 }

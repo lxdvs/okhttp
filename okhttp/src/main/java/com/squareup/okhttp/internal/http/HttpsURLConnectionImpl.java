@@ -341,6 +341,11 @@ public final class HttpsURLConnectionImpl extends HttpsURLConnection {
   @Override public SSLSocketFactory getSSLSocketFactory() {
     return delegate.client.getSslSocketFactory();
   }
+  
+  public
+  void setAllowFailedPostRetry(boolean allow) {
+      delegate.setAllowFailedPostRetry(allow);
+  }
 
   private final class HttpUrlConnectionDelegate extends HttpURLConnectionImpl {
     private HttpUrlConnectionDelegate(URL url, OkHttpClient client) {
