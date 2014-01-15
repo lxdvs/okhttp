@@ -16,7 +16,6 @@
  */
 package com.squareup.okhttp.internal.http;
 
-import com.squareup.okhttp.OkHttpClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,13 +28,16 @@ import java.security.Principal;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-public final class HttpsURLConnectionImpl extends HttpsURLConnection {
+import com.squareup.okhttp.OkHttpClient;
+
+public final class HttpsURLConnectionImpl extends HttpsURLConnection implements ReflectMethod {
 
   /** HttpUrlConnectionDelegate allows reuse of HttpURLConnectionImpl. */
   private final HttpUrlConnectionDelegate delegate;
@@ -362,4 +364,9 @@ public final class HttpsURLConnectionImpl extends HttpsURLConnection {
           : null;
     }
   }
+
+    @Override
+    public void setMethodReflect(String method) throws SecurityException, NoSuchFieldException {
+        HttpURLConnectionImpl.applyPatchMethodToHttpURLConnection(delegate, method);
+    }
 }

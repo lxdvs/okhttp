@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -58,7 +59,7 @@ import com.squareup.okhttp.internal.Util;
  * connection} field on this class for null/non-null to determine of an instance
  * is currently connected to a server.
  */
-public class HttpURLConnectionImpl extends HttpURLConnection implements Policy {
+public class HttpURLConnectionImpl extends HttpURLConnection implements Policy, ReflectMethod {
 
     /** Numeric status code, 307: Temporary Redirect. */
     static final int HTTP_TEMP_REDIRECT = 307;
@@ -600,4 +601,20 @@ public class HttpURLConnectionImpl extends HttpURLConnection implements Policy {
         fixedContentLength = contentLength;
         super.fixedContentLength = (int) Math.min(contentLength, Integer.MAX_VALUE);
     }
+    
+    public void setMethodReflect(String method) throws SecurityException, NoSuchFieldException {
+        applyPatchMethodToHttpURLConnection(this, method);
+    }
+    
+    static void applyPatchMethodToHttpURLConnection(HttpURLConnection connection, String method) throws SecurityException, NoSuchFieldException {
+        Field methodField = HttpURLConnection.class.getDeclaredField("method");
+        methodField.setAccessible(true);
+        try {
+            methodField.set(connection, method);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unsupported PATCH type", e);
+        }
+    }
+    
+    
 }
